@@ -1,0 +1,15 @@
+Faturamento =
+SUMX(
+    vendas,
+    vendas[quantidade] * vendas[preco_unitario] * (1 - vendas[desconto])
+)
+
+Itens Vendidos = SUM(vendas[quantidade])
+
+Pedidos = DISTINCTCOUNT(vendas[id_venda])
+
+Ticket Médio = DIVIDE([Faturamento], [Pedidos])
+
+Preço Médio = DIVIDE([Faturamento], [Itens Vendidos])
+
+Desconto Médio = AVERAGE(vendas[desconto])
