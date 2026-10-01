@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate sales calculations
+        run: |
+          python - <<'PY'
+          import csv
+          from decimal import Decimal, ROUND_HALF_UP
+          with open("data/vendas.csv", newline="", encoding="utf-8") as f:
+              for n, row in enumerate(csv.DictReader(f), 2):
+                  expected = (Decimal(row["quantidade"]) * Decimal(row["preco_unitario"]) * (Decimal("1") - Decimal(row["desconto"]))).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+                  actual = Decimal(row["faturamento"]).quantize(Decimal("0.01"))
+                  if expected != actual:
+                      raise SystemExit(f"Linha {n}: faturamento {actual} != {expected}")
+          print("CSV validado com sucesso.")
+          PY
